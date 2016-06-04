@@ -48,7 +48,7 @@ public class Page {
     private String charset;
     
 	public String getCharset() {
-		return charset;
+		return this.charset==null?"utf-8":this.charset;
 	}
 
 	public void setCharset(String charset) {
