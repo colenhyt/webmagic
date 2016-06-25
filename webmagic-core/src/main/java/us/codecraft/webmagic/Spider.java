@@ -310,6 +310,7 @@ public class Spider implements Runnable, Task {
         checkRunningStat();
         initComponent();
         logger.info("Spider " + getUUID() + " started!");
+        try {
         while (!Thread.currentThread().isInterrupted() && stat.get() == STAT_RUNNING) {
             Request request = scheduler.poll(this);
             if (request == null) {
@@ -336,6 +337,9 @@ public class Spider implements Runnable, Task {
                     }
                 });
             }
+        }
+        }catch (Exception e){
+        	System.out.println("error occured "+e.getMessage());
         }
         stat.set(STAT_STOPPED);
         // release some resources
