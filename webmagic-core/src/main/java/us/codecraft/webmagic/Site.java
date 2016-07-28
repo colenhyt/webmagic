@@ -487,7 +487,7 @@ public class Site {
     }
 
     /**
-     * Set httpProxyPool, String[0]:ip, String[1]:port <br>
+     * Set httpProxyPool, String[0]:user,String[1]:pwd,String[2]:ip, String[3]:port <br>
      *
      * @param httpProxyList httpProxyList
      * @return this
