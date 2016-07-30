@@ -25,7 +25,11 @@ import org.apache.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.fastjson.JSON;
+
+import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.utils.FilePersistentBase;
+import us.codecraft.webmagic.utils.FileUtils;
 import us.codecraft.webmagic.utils.ProxyUtils;
 
 /**
@@ -63,6 +67,30 @@ public class SimpleProxyPool implements ProxyPool {
         }
     };
 
+    //实时获取网上代理Ip并加载
+    public SimpleProxyPool(String agent,String savePath){
+    	ProxyDataGetProcessor processor = new ProxyDataGetProcessor(agent);
+        Spider spider = Spider.create(processor).thread(1);
+        spider.run();
+        spider.close();
+        List<ProxyDesc> proxyList = processor.getProxyList();
+        //save latest:
+        String fileName = savePath+"proxy.json";
+        if (proxyList.size()>0){
+        	String content = JSON.toJSONString(proxyList);
+        	FileUtils.writeFile(fileName, content);
+        }else {		//找不到，装载上一次的, load old proxy:
+        	String content = FileUtils.readFile(fileName);
+        	proxyList = (List<ProxyDesc>)JSON.parseArray(content, ProxyDesc.class);
+        }
+        List<String[]> proxys = new ArrayList<String[]>();
+        for (ProxyDesc desc:proxyList){
+        	proxys.add(desc.toArray());
+        }
+        if (proxys.size()>0)
+        addProxy(proxys.toArray(new String[proxys.size()][]));
+    }
+    
     public SimpleProxyPool() {
         this(null, true);
     }

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import us.codecraft.webmagic.Page;
@@ -26,7 +27,7 @@ public class ProxyDataGetProcessor implements PageProcessor {
     public ProxyDataGetProcessor(String userAgent){
     	String startUrl = "http://www.xicidaili.com/nn/";
     	
-    	proxyUrls.add("");
+    	proxyUrls.add("http://www.proxy360.cn");
     	
     	site = new Site();
     	if (userAgent!=null)
@@ -53,7 +54,7 @@ public class ProxyDataGetProcessor implements PageProcessor {
 			desc.setProtocol(tds.get(5).text().trim());
 			proxyList.add(desc);
 		}
-		System.out.println(proxyList.size());
+		System.out.println("找到代理IP: "+proxyList.size());
     }
     
     @Override
@@ -63,7 +64,19 @@ public class ProxyDataGetProcessor implements PageProcessor {
     	
     	if (url.indexOf("xicidaili.com")>0){
     		process1(doc);
+    	}else if (url.indexOf("proxy360")>0){
+    		Elements els = doc.select("div").select("[class=proxylistitem]");
+    		for (Element ee:els){
+    			ProxyDesc desc = new ProxyDesc();
+        		Elements tds = ee.select("span").select("[class=tbBottomLine]");
+        		desc.setIp(tds.get(0).text().trim());
+        		desc.setPort(tds.get(1).text().trim());
+        		proxyList.add(desc);
+    		}
+    		System.out.println(url+"找到代理IP: "+proxyList.size());
     	}
+    	
+    	page.addTargetRequests(proxyUrls);
     }
 
     @Override
